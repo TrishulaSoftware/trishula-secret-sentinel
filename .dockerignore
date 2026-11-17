@@ -1,0 +1,12 @@
+.git
+venv/
+.venv
+__pycache__
+.env
+*.pyc
+*.pyo
+*.bak
+backups/
+receipts/
+Aegis-Systems/
+pulse_law.md

@@ -1,0 +1,9 @@
+{
+  "name": "trishula-secret-sentinel",
+  "version": "1.1.0",
+  "description": "Offline secret scanner for codebases, staged diffs, and git history with 34 patterns, redacted output, and SHA-256 + SHA3-512 Merkle attestation.",
+  "type": "skill",
+  "author": "Trishula Software",
+  "entrypoint": "scripts/secret_sentinel.py",
+  "skill_file": "SKILL.md"
+}

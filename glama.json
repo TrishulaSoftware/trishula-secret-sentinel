@@ -1,0 +1,9 @@
+{
+  "$schema": "https://glama.ai/mcp/schema.json",
+  "name": "trishula-secret-sentinel",
+  "description": "Air-gapped secret scanner for code, staged diffs, and git history covering 34 credential patterns including LLM provider keys with redacted output and content-bound SHA-256 + SHA3-512 Merkle attestation.",
+  "repository": "https://github.com/TrishulaSoftware/trishula-secret-sentinel",
+  "license": "MIT",
+  "transport": "stdio",
+  "runtime": "python"
+}

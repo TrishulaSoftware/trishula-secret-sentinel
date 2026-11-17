@@ -86,7 +86,7 @@ jobs:
         run: |
           if [ "${{ needs.test.result }}" == "success" ]; then
             echo "## ✅ SQA VERDICT: PASS" >> $GITHUB_STEP_SUMMARY
-            echo "Secret Sentinel: **45/45 PASS** — SQA v5 ASCENDED EXCEEDED" >> $GITHUB_STEP_SUMMARY
+            echo "Secret Sentinel: **all tests PASS** — SQA v5 ASCENDED EXCEEDED" >> $GITHUB_STEP_SUMMARY
           else
             echo "## ❌ SQA VERDICT: FAIL" >> $GITHUB_STEP_SUMMARY
             exit 1

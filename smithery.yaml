@@ -1,0 +1,6 @@
+name: trishula-secret-sentinel
+version: 1.1.0
+description: Air-gapped, zero-dependency secret scanner for codebases, staged git diffs, and commit history with content-bound SHA-256 and SHA3-512 Merkle attestation.
+command: python
+args:
+  - mcp_server.py

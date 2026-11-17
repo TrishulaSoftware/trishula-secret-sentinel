@@ -1,0 +1,76 @@
+name: "Trishula Secret Sentinel"
+author: "Trishula Software"
+description: "Air-gapped, zero-dependency secret scanner and SARIF 2.1.0 attestation gate for codebases and git history."
+branding:
+  icon: "lock"
+  color: "purple"
+
+inputs:
+  target_path:
+    description: "Directory or file path to scan"
+    required: false
+    default: "."
+  mode:
+    description: "Scan mode: scan or history"
+    required: false
+    default: "scan"
+  max_commits:
+    description: "Maximum commits to inspect when mode=history"
+    required: false
+    default: "200"
+  entropy:
+    description: "Set to true to enable Shannon entropy flagging"
+    required: false
+    default: "false"
+  fail_on:
+    description: "Minimum severity to fail CI: any, medium, high, critical, or never"
+    required: false
+    default: "any"
+  sarif_output:
+    description: "Path to write SARIF v2.1.0 report"
+    required: false
+    default: "secret-sentinel-results.sarif"
+  attest_output:
+    description: "Path to write SHA-256 + SHA3-512 attestation JSON"
+    required: false
+    default: "secret-sentinel-attestation.json"
+
+outputs:
+  verdict:
+    description: "CLEAN or FINDINGS_DETECTED"
+    value: ${{ steps.run_scan.outputs.verdict }}
+  finding_count:
+    description: "Total findings count"
+    value: ${{ steps.run_scan.outputs.finding_count }}
+  attestation_hash:
+    description: "Content-bound SHA-256 attestation digest"
+    value: ${{ steps.run_scan.outputs.attestation_hash }}
+  merkle_root:
+    description: "SHA3-512 Merkle root"
+    value: ${{ steps.run_scan.outputs.merkle_root }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Trishula Secret Sentinel
+      id: run_scan
+      shell: bash
+      run: |
+        set +e
+        CMD_ARGS=()
+        if [ "${{ inputs.mode }}" = "history" ]; then
+          CMD_ARGS+=(history --repo "${{ inputs.target_path }}" --max-commits "${{ inputs.max_commits }}")
+        else
+          CMD_ARGS+=(scan "${{ inputs.target_path }}")
+        fi
+        if [ "${{ inputs.entropy }}" = "true" ]; then
+          CMD_ARGS+=(--entropy)
+        fi
+        python "${{ github.action_path }}/secret_sentinel.py" "${CMD_ARGS[@]}" --format sarif --fail-on never > "${{ inputs.sarif_output }}"
+        python "${{ github.action_path }}/secret_sentinel.py" "${CMD_ARGS[@]}" --format markdown --attest-out "${{ inputs.attest_output }}" --fail-on "${{ inputs.fail_on }}" >> "$GITHUB_STEP_SUMMARY"
+        EXIT_CODE=$?
+        echo "verdict=$(python -c "import json; d=json.load(open('${{ inputs.attest_output }}')); print(d.get('verdict',''))")" >> "$GITHUB_OUTPUT"
+        echo "finding_count=$(python -c "import json; d=json.load(open('${{ inputs.attest_output }}')); print(d.get('finding_count',0))")" >> "$GITHUB_OUTPUT"
+        echo "attestation_hash=$(python -c "import json; d=json.load(open('${{ inputs.attest_output }}')); print(d.get('attestation_hash',''))")" >> "$GITHUB_OUTPUT"
+        echo "merkle_root=$(python -c "import json; d=json.load(open('${{ inputs.attest_output }}')); print(d.get('merkle_root_sha3_512',''))")" >> "$GITHUB_OUTPUT"
+        exit $EXIT_CODE
