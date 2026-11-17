@@ -1,0 +1,4 @@
+# Trishula Secret Sentinel Rules
+- Run `python secret_sentinel.py staged --format text` before every `git commit` or `git push`.
+- Run `python secret_sentinel.py scan . --format text` after editing any `.env`, CI workflow, or config file.
+- Never paste or print raw credentials; report only redacted matches and line numbers.
